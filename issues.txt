@@ -1,0 +1,16 @@
+pragma's for Nat make later imports of Natural to use Bin impossible
+
+<=-iff-< is worded in a way that I don't understand what I'm supposed to write. do I write <=-iff-< and <-iff-<= ? we haven't written products at this time so it's not a normal iff relationship
+
+I don't understand what preorder reasoning helps us do
+In what fucking universe is it more readable? For +-monoʳ-≤ ?
+really struggling to see the value of ≡-Reasoning/≤-Reasoning just now
+
+<MarcelineVQ> can I place the cursor over an identifier and ask for its type? e.g. open Eq using (_≡_; refl; cong; co<cursor_here>ng-app)  then some key combo.   or do I have to write something like C-c C-d cong-app<RET>
+<mietek> MarcelineVQ: another excellent feature request (if not already requested)
+
+feature request for filling in 'with' rules
+
+feature request for making a skeleton for a type sig we just wrote
+
+essentially all the advantages of idris should be cannibalized and it's weird that they're not
