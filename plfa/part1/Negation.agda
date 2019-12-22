@@ -11,6 +11,7 @@ open import plfa.part1.Isomorphism using (_≃_; extensionality; _≲_)
 open import plfa.part1.Relations using (_<_;z<s;s<s)
 open import plfa.part1.Connectives using (→-elim;η-→)
 
+
 ¬_ : Set → Set
 ¬_ A = A → ⊥
 
@@ -119,7 +120,26 @@ trichotomy (suc m) (suc n) | inj₂ (inj₂ (m≮n , m≢n , n<m)) =
     ; from∘to = λ {w →  {!   !}}
     }
 
+postulate
+  em : ∀ {A : Set} → A ⊎ ¬ A
 
+em-irrefutable : ∀ {A : Set} → ¬ ¬ (A ⊎ ¬ A)
+em-irrefutable = λ k → k (inj₂ λ x → k (inj₁ x))
+
+Stable : Set → Set
+Stable A = ¬ ¬ A → A
+
+S : Set → Set
+S = Stable
+
+-- Show that any negated formula is stable, and that the conjunction of two stable formulas is stable.
+
+¬-stable : {A : Set} → ¬ A → Stable A
+¬-stable ¬a k = ¬a ↯ k
+
+-- Is this showing the conjunction of two stable formulas is stable?
+×-stable : {A B : Set} → (Stable A × Stable B) → Stable (Stable A × Stable B)
+×-stable (sa , sb) sk = sa , sb
 
 
 
