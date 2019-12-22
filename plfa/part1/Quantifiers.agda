@@ -183,7 +183,11 @@ Above says:
 Expected record pattern
 when checking the let binding ⟨ j , k ⟩ = c
 
-Yet if I import Σ from Data.Product there is no error.
-Why does it need a 'record pattern' in the first place?
+If I replace our definition of Σ at line #55 with an
+import of Σ from Data.Product there is no error.
+I understand that Data.Product.Σ is a record but
+why does it need a 'record pattern' in the first place?
+What is a record pattern?
+Is ⟨ , ⟩ not a constructor, why isn't that a valid pattern?
 
 -}
