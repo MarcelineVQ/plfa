@@ -14,3 +14,36 @@ feature request for filling in 'with' rules
 feature request for making a skeleton for a type sig we just wrote
 
 essentially all the advantages of idris should be cannibalized and it's weird that they're not
+
+
+
+<MarcelineVQ> Is this written somewhere I can peruse? As a human {x y z : ℕ} is expressing Nats labeled as x, y, and z
+<mietek> …in an order.
+<mietek> https://agda.readthedocs.io/en/v2.6.0.1/language/telescopes.html
+<mietek> It should be written here. :P
+<Franciman> do you know of any interesting new programming language?
+<mietek> MarcelineVQ: https://wiki.portal.chalmers.se/agda/pmwiki.php?n=Docs.FunctionSyntax is barely more…
+<mietek> MarcelineVQ: https://wiki.portal.chalmers.se/agda/pmwiki.php?n=Docs.DatatypeAndFunctionDefinitions has some more
+<mietek> MarcelineVQ: https://wiki.portal.chalmers.se/agda/pmwiki.php?pagename=Site%2FSearch&q=telescope
+<mietek> https://wiki.portal.chalmers.se/agda/pmwiki.php?n=ReferenceManual.CoreSyntax
+<mietek> > TODO: syntax for telescopes.
+<MarcelineVQ> I'll accept there's an ordering, I just regret this wasn't clearer sooner. Certainly it matches the fact that function arguments have an order in the first place. I'm just used to being able to be, less verbosely, choosier about what implicits are brough in scope I guess hehe
+<mietek> Are you sure Idris does that?
+<MarcelineVQ> And this would probably have been entirely obvious if they were all Nat since the types would align
+<mietek> I said, you can `{z = z}`.
+<MarcelineVQ> *wouldn't alsign
+<mietek> (I also don’t like that.)
+<mietek> > See the official user manual for the most up-to-date version of the information on this page.
+<mietek> https://agda.readthedocs.io/en/latest/language/core-language.html
+<mietek> > This is a stub
+<MarcelineVQ> Don't like which?
+<mietek> I don’t like that `{z = z}` is ever so slightly more verbose than `{z}` which should really do the right thing.
+<mietek> Another feature request?
+<MarcelineVQ> Don't like that agda needs that?
+<mietek> Yes.
+<MarcelineVQ> "feature request: implicit punning (why can't you just be idris)" hehe
+
+
+The designers at the time must have found the automatic renaming useful somehow, where b is rename a during introduction
+foo : {b : Nat} -> B; foo {a} = ?
+I wonder how much this conflicts with that desire, or how useful/relied-on that design even is.

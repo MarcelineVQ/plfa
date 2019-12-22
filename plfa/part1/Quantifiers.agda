@@ -51,8 +51,10 @@ data Tri : Set where
     ; to∘from = λ y → refl
     }
 
+
 data Σ (A : Set) (B : A → Set) : Set where
   ⟨_,_⟩ : (x : A) → B x → Σ A B
+
 
 Σ-syntax = Σ
 infix 2 Σ-syntax
@@ -158,30 +160,21 @@ feb m rewrite *-comm m 2 | +-comm m zero = refl
 
 ∃-odd′ ⟨ m , refl ⟩ rewrite +-comm m zero | +-comm (m + m) 1 = odd.suc (∃-even ⟨ m , feb m ⟩)
 
-feha : ∀ (m n : ℕ) → suc (m + n) ≡ suc m + n
-feha m n = refl
-
 feh : ∀ {x y : ℕ} → y ≤ x + y
-feh {x} {zero} = z≤n
+feh {_} {zero} = z≤n
 feh {x} {suc y} rewrite +-suc x y = s≤s feh
 
-beb : ∀ {m n : ℕ} → m ≤ n → ∃[ x2 ] (x2 + suc m ≡ suc n)
-beb {.0} {zero} z≤n = ⟨ zero , refl ⟩
-beb {.0} {suc n} z≤n rewrite +-comm 1 n = ⟨ 1 + n , refl ⟩
-beb {.(suc _)} {suc n} (s≤s a) =
-  let d = beb a
-      -- g = cong₂ _≡_ 
-  in ⟨ zero , {!   !} ⟩
-
 ∃-+-≤ : ∀ {x y z : ℕ} → ((y ≤ z) ⇔ (∃[ x ] (x + y ≡ z)))
-∃-+-≤ =
+∃-+-≤ {x} {y} {z} =
   record
-    { from = λ { ⟨ x , refl ⟩ → feh }
-    ; to = λ { z≤n  → ⟨ _ , +-comm _ zero ⟩
-             -- ^ Do I have to use _ here?
-             -- There's so much 'not in scope' and I don't know
-             -- how to bring them into scope in a lambda.
-             ; (s≤s x) → {!   !}
+    { from = λ { ⟨ n , refl ⟩ → feh
+               }
+    ; to = λ { z≤n  → ⟨ z , +-comm z zero ⟩
+             ; (s≤s {m} {n} s) → 
+             let c = to (∃-+-≤ {zero} {m} {n}) s
+                 ⟨ j , k ⟩ = c
+             in ⟨ {!   !} , {!   !} ⟩
              }
     }
   where open _⇔_
+
