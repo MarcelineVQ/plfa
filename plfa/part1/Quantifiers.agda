@@ -177,4 +177,13 @@ feh {x} {suc y} rewrite +-suc x y = s≤s feh
              }
     }
   where open _⇔_
+{-
+Above says:
 
+Expected record pattern
+when checking the let binding ⟨ j , k ⟩ = c
+
+Yet if I import Σ from Data.Product there is no error.
+Why does it need a 'record pattern' in the first place?
+
+-}
