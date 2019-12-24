@@ -238,6 +238,6 @@ foldr-append-∷′ xs ys rewrite sym (foldr-∷ ys) | sym (foldr-++ _∷_ [] xs
 -- application despite being applied to xs.
 map-is-foldr : ∀ {A B : Set} (f : A → B) → map f ≡ foldr (λ x xs → f x ∷ xs) []
 map-is-foldr f = extensionality λ { [] → refl
-               {- problem here -} ; (x ∷ xs) → cong (f x ∷_) (cong-app (map-is-foldr f) xs)
-                                  }
+                                  ; (x ∷ xs) → cong (f x ∷_) (cong-app (map-is-foldr f) xs) }
+-- ^ problem here, (map-is-foldr f) is a termination checking failure
 
