@@ -47,3 +47,8 @@ essentially all the advantages of idris should be cannibalized and it's weird th
 The designers at the time must have found the automatic renaming useful somehow, where b is rename a during introduction
 foo : {b : Nat} -> B; foo {a} = ?
 I wonder how much this conflicts with that desire, or how useful/relied-on that design even is.
+
+
+module Decidable import should be _≤_; z<n; s<s
+
+Decidable.agda unicode says ⌊  U+230A  LEFT FLOOR (\cll)  but it's \clL  same for \clr

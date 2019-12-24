@@ -5,11 +5,12 @@ open Eq using (_≡_;refl;cong;cong₂;trans;cong-app;sym)
 open import Data.Nat using (ℕ; zero; suc; _+_; _*_)
 open import Data.Nat.Properties using (+-comm;*-comm;+-suc)
 open import Relation.Nullary using (¬_)
-open import Data.Product using (_×_; proj₁;proj₂) renaming (_,_ to ⟨_,_⟩)
+open import Data.Product using (_×_; proj₁;proj₂;Σ) renaming (_,_ to ⟨_,_⟩)
 open import Data.Sum using (_⊎_;inj₁;inj₂)
 open import plfa.part1.Isomorphism using (_≃_; ∀-extensionality; extensionality;_⇔_)
 open import Function using (_∘_)
 open import plfa.part1.Relations using (even;odd;_≤_;≤-refl;s≤s;z≤n;≤-trans)
+import plfa.part1.Equality as Eqr
 
 -- I don't like that the last two are just refl porbbaly due to
 -- my 'to' but w/e, it's not really a bad thing.
@@ -52,8 +53,8 @@ data Tri : Set where
     }
 
 
-data Σ (A : Set) (B : A → Set) : Set where
-  ⟨_,_⟩ : (x : A) → B x → Σ A B
+-- data Σ (A : Set) (B : A → Set) : Set where
+  -- ⟨_,_⟩ : (x : A) → B x → Σ A B
 
 
 Σ-syntax = Σ
@@ -111,7 +112,7 @@ syntax ∃-syntax (λ x → B) = ∃[ x ] B
   (∃[ x ] B x) × (∃[ x ] C x) → ∃[ x ] (B x × C x)
 ×∃-implies-∃× ⟨ b , c  ⟩ = {!   !}
 -- These 'show this is impossible' questions are extremely difficult because I don't know anything. How do I prove what I don't know?
--- That is to say, that I can't prove it doesn't mean it can't be proven!
+-- That is to say: that I can't prove it doesn't mean it can't be proven!
 
 ∃-⊎ : ∀ {B : Tri → Set} → ∃[ x ] B x ≃ B aa ⊎ B bb ⊎ B cc
 ∃-⊎ = 
@@ -164,30 +165,40 @@ feh : ∀ {x y : ℕ} → y ≤ x + y
 feh {_} {zero} = z≤n
 feh {x} {suc y} rewrite +-suc x y = s≤s feh
 
+beb : ∀ {m n : ℕ} → m ≤ n → ∃[ x ] (x + suc m ≡ suc n)
+beb {n = n} z≤n = ⟨ n , +-comm n 1 ⟩
+beb (s≤s s) with beb s
+beb (s≤s s) | ⟨ zero , refl ⟩ = ⟨ zero , refl ⟩
+beb (s≤s s) | ⟨ suc h , refl ⟩ = ⟨ h , {!   !} ⟩
+  where
+    open Eq.≡-Reasoning
+    faf : ∀ (m n  : ℕ) → m + suc (suc n) ≡ suc (suc (m + suc n))
+    faf m n =
+      begin
+        m + suc (suc n)
+      ≡⟨ {!   !} ⟩
+        suc (m + suc n)
+      ≡⟨ {!   !} ⟩
+        suc (suc (m + suc n))
+      ∎
+
+-- unsolved. This is listed as practice but it's harder so far
+-- than stretch assignments. I need messy lemmas for both parts.
+-- What am I missing? What is the pattern I need to solve the
+-- inductive case of to?
 ∃-+-≤ : ∀ {x y z : ℕ} → ((y ≤ z) ⇔ (∃[ x ] (x + y ≡ z)))
-∃-+-≤ {x} {y} {z} =
+∃-+-≤ {z = z} =
   record
     { from = λ { ⟨ n , refl ⟩ → feh
-               }
-    ; to = λ { z≤n  → ⟨ z , +-comm z zero ⟩
-             ; (s≤s {m} {n} s) → 
-             let c = to (∃-+-≤ {zero} {m} {n}) s
-                 ⟨ j , k ⟩ = c
-             in ⟨ {!   !} , {!   !} ⟩
+    }
+    ; to = λ { z≤n → ⟨ z , +-comm z zero ⟩
+             ; (s≤s s) → beb s
              }
     }
-  where open _⇔_
-{-
-Above says:
+  where open _⇔_; open Eqr.≤-Reasoning
 
-Expected record pattern
-when checking the let binding ⟨ j , k ⟩ = c
 
-If I replace our definition of Σ at line #55 with an
-import of Σ from Data.Product there is no error.
-I understand that Data.Product.Σ is a record but
-why does it need a 'record pattern' in the first place?
-What is a record pattern?
-Is ⟨ , ⟩ not a constructor, why isn't that a valid pattern?
 
--}
+
+
+

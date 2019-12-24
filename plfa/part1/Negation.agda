@@ -108,8 +108,9 @@ trichotomy (suc m) (suc n) | inj₂ (inj₂ (m≮n , m≢n , n<m)) =
     }
 
 
--- ^ Q. If so, prove; if not, can you give a relation weaker than isomorphism that relates the two sides?
--- I don't know any other relations. ≲ still has 'to' and 'from'
+-- ^ Q. If so, prove; if not, can you give a relation weaker
+--  than isomorphism that relates the two sides?
+-- I don't many other relations. ≲ still has 'to' and 'from'
 -- which I couldn't prove above, so no I guess?
 
 ×-partial-dual-⊎ : ∀ {A B : Set} → ¬ (A × B) ≲ (¬ A) ⊎ (¬ B)
@@ -138,6 +139,8 @@ S = Stable
 ¬-stable ¬a k = ¬a ↯ k
 
 -- Is this showing the conjunction of two stable formulas is stable?
+-- Have I phrased the type correctly?
+-- Should it be (Stable A × Stable B) → Stable (A × B) ?
 ×-stable : {A B : Set} → (Stable A × Stable B) → Stable (Stable A × Stable B)
 ×-stable (sa , sb) sk = sa , sb
 
