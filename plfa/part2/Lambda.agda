@@ -1,6 +1,6 @@
 module plfa.part2.Lambda where
 
-open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl)
+open import Relation.Binary.PropositionalEquality using (_≡_; _≢_; refl;cong)
 open import Data.String using (String; _≟_)
 open import Data.Nat using (ℕ; zero; suc)
 open import Data.Empty using (⊥; ⊥-elim)
@@ -224,7 +224,7 @@ data _—↠_ : Term → Term → Set where
   _∎ : ∀ M
     → M —↠ M
 
-  _—→⟨_⟩_ : ∀ L {M N}
+  _—→⟨_⟩_ : ∀ {M N} L
     → L —→ M
     → M —↠ N
     → L —↠ N
@@ -254,48 +254,32 @@ data _—↠′_ : Term → Term → Set where
 —↠≲—↠′ : ∀ {L M} → L —↠ M ≲ L —↠′ M
 —↠≲—↠′ {L} {M} =
   record
-    { to = λ { (M ∎) → refl′
-             ; (L —→⟨ L—→M1 ⟩ M1—↠M) → toTrans L—→M1 M1—↠M
-             }
-    ; from = fromF
-    ; from∘to = λ { (M ∎) → refl
-                  ; (L —→⟨ x ⟩ M ∎) → refl
-                  ; (L —→⟨ x ⟩ L₁ —→⟨ x₁ ⟩ y) → {!   !}
-                  }
+    { to = to
+    ; from = from
+    ; from∘to = from∘to
     }
   where
-    open _≲_
 
-    toTrans : ∀ {L M1 M} → L —→ M1 → M1 —↠ M → L —↠′ M
-    toTrans L1—→M (M ∎) = step′ L1—→M
-    toTrans L1—→L (L —→⟨ L—→M1 ⟩ M1—↠M2) = trans′ (step′ L1—→L) (toTrans L—→M1 M1—↠M2)
+    to : ∀ {L M} → L —↠ M → L —↠′ M
+    to (M ∎) = refl′
+    to (L —→⟨ L—→M1 ⟩ M1—↠M2) = trans′ (step′ L—→M1) (to M1—↠M2)
 
-    fromF : ∀ {L M} → L —↠′ M → L —↠ M
-    fromF {L} {M} (step′ x) = L —→⟨ x ⟩ M ∎
-    fromF {L} refl′ = L ∎
-    fromF {L} {M} (trans′ x y) with fromF x | fromF y
-    ... | M ∎ | .M ∎ = M ∎
-    ... | M₁ ∎ | .M₁ —→⟨ x₁ ⟩ d = M₁ —→⟨ x₁ ⟩ d
-    ... | L —→⟨ x₁ ⟩ c | M ∎ = L —→⟨ x₁ ⟩ c
-    fromF {L} {M} (trans′ x y) | L —→⟨ x₁ ⟩ .L₁ ∎ | L₁ —→⟨ x₂ ⟩ M ∎ = L —→⟨ x₁ ⟩ L₁ —→⟨ x₂ ⟩ M ∎
-    fromF {L} {M} (trans′ x y) | L —→⟨ x₁ ⟩ .L₁ ∎ | L₁ —→⟨ x₂ ⟩ L₂ —→⟨ x₃ ⟩ p = L —→⟨ x₁ ⟩ L₁ —→⟨ x₂ ⟩ L₂ —→⟨ x₃ ⟩ p
-    fromF {L} {M} (trans′ x y) | _—→⟨_⟩_ L {.P} {.Q} x₁ (_—→⟨_⟩_ P {.Q} {.Q} x₃ (.Q ∎)) | _—→⟨_⟩_ Q {.M} {.M} x₂ (M ∎) = L —→⟨ x₁ ⟩ P —→⟨ x₃ ⟩ Q —→⟨ x₂ ⟩ M ∎
-    fromF {L} {M} (trans′ x y) | _—→⟨_⟩_ L {.P} {.Q} x₁ (_—→⟨_⟩_ P {.L₁} {.Q} x₃ (L₁ —→⟨ x₄ ⟩ c)) | _—→⟨_⟩_ Q {.M} {.M} x₂ (M ∎) =     
-      begin
-        L
-      —→⟨ {!   !} ⟩ -- endless cycle of casing c
-        M
-      ∎
+    -- how did Zambonifofex determine he needed 3 types here :(
+    -- it's obvious once you start pattern matching and have
+    -- holes but you need types written before that
+    -- further, why is this N —↠′ L → N —↠ M and not N —↠′ L → N —↠ L
+    traverse : ∀ {L M N} → L —↠ M → N —↠′ L → N —↠ M
+    traverse acc (step′ x) = _ —→⟨ x ⟩ acc
+    traverse acc refl′ = acc
+    traverse acc (trans′ x y) = traverse (traverse acc y) x
 
-    fromF {L} {M} (trans′ x y) | L —→⟨ x₁ ⟩ L₂ —→⟨ x₃ ⟩ c | L₁ —→⟨ x₂ ⟩ L₃ —→⟨ x₄ ⟩ p = {!   !}
--- ^ What am I supposed to do?
--- I just don't understand what to do when things go wrong.
--- What do I do here? Should I even have gotten to this point?
--- It's such an unredable mess and naming things like
--- L—→M­­₁ : L —→ M₁ isn't exactly more readable or typable
+    from : ∀ {L M} → L —↠′ M → L —↠ M
+    from {L} {M} t = traverse (M ∎) t
 
--- This isn't even listed as a Stretch exercise it's Practice
--- It's so fucking demoralizing.
+    from∘to : ∀ {L M} → (x : L —↠ M) → from (to x) ≡ x
+    from∘to (M ∎) = refl
+    from∘to (L —→⟨ x ⟩ t) = cong (L —→⟨ x ⟩_) (from∘to t)
+
 
 
 

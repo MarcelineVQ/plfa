@@ -469,7 +469,7 @@ All-++-≃ xs ys =
                 ; ⟨ x ∷ xs , ys ⟩ → let c = to∘from in {!   !}}
   ; from∘to = {!   !}
   }
-  where open _⇔_; open _≃_;
+  where open _⇔_; open _≃_
   
   
 
