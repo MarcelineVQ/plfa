@@ -257,10 +257,11 @@ data _—↠′_ : Term → Term → Set where
     { to = λ { (M ∎) → refl′
              ; (L —→⟨ L—→M1 ⟩ M1—↠M) → toTrans L—→M1 M1—↠M
              }
-    ; from = λ { (step′ L—→M) → L —→⟨ L—→M ⟩ M ∎
-               ; refl′ → L ∎
-               ; (trans′ L—↠′M1 M1—↠′M) → fromTrans L—↠′M1 M1—↠′M}
-    ; from∘to = {!   !}
+    ; from = fromF
+    ; from∘to = λ { (M ∎) → refl
+                  ; (L —→⟨ x ⟩ M ∎) → refl
+                  ; (L —→⟨ x ⟩ L₁ —→⟨ x₁ ⟩ y) → {!   !}
+                  }
     }
   where
     open _≲_
@@ -269,8 +270,16 @@ data _—↠′_ : Term → Term → Set where
     toTrans L1—→M (M ∎) = step′ L1—→M
     toTrans L1—→L (L —→⟨ L—→M1 ⟩ M1—↠M2) = trans′ (step′ L1—→L) (toTrans L—→M1 M1—↠M2)
 
-    fromTrans : ∀ {L M N} → L —↠′ M → M —↠′ N → L —↠ N
-    fromTrans {L} {_} {N} L—↠′M M—↠′N with trans′ L—↠′M M—↠′N
-    ... | step′ L—→N = L —→⟨ L—→N ⟩ N ∎
-    ... | refl′ = L ∎
-    ... | trans′ x y = fromTrans x y -- this is a termination issue
+    fromF : ∀ {L M} → L —↠′ M → L —↠ M
+    fromF {L} {M} (step′ x) = L —→⟨ x ⟩ M ∎
+    fromF {L} refl′ = L ∎
+    fromF {L} {M} (trans′ x y) with fromF x | fromF y
+    ... | M ∎ | .M ∎ = M ∎
+    ... | M₁ ∎ | .M₁ —→⟨ x₁ ⟩ d = M₁ —→⟨ x₁ ⟩ d
+    ... | L —→⟨ x₁ ⟩ c | M ∎ = L —→⟨ x₁ ⟩ c
+    fromF {L} {M} (trans′ x y) | L —→⟨ x₁ ⟩ c | L₁ —→⟨ x₂ ⟩ d =
+      begin
+        L
+      —→⟨ {!   !} ⟩ -- M₂ is probably coming from the with pattern
+        M           -- for fromF y but idk how to bring it into scope
+      ∎
