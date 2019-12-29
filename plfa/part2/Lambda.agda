@@ -277,13 +277,27 @@ data _—↠′_ : Term → Term → Set where
     ... | M ∎ | .M ∎ = M ∎
     ... | M₁ ∎ | .M₁ —→⟨ x₁ ⟩ d = M₁ —→⟨ x₁ ⟩ d
     ... | L —→⟨ x₁ ⟩ c | M ∎ = L —→⟨ x₁ ⟩ c
-    fromF {L} {M} (trans′ x y) | L —→⟨ x₁ ⟩ c | L₁ —→⟨ x₂ ⟩ d =
+    fromF {L} {M} (trans′ x y) | L —→⟨ x₁ ⟩ .L₁ ∎ | L₁ —→⟨ x₂ ⟩ M ∎ = L —→⟨ x₁ ⟩ L₁ —→⟨ x₂ ⟩ M ∎
+    fromF {L} {M} (trans′ x y) | L —→⟨ x₁ ⟩ .L₁ ∎ | L₁ —→⟨ x₂ ⟩ L₂ —→⟨ x₃ ⟩ p = L —→⟨ x₁ ⟩ L₁ —→⟨ x₂ ⟩ L₂ —→⟨ x₃ ⟩ p
+    fromF {L} {M} (trans′ x y) | _—→⟨_⟩_ L {.P} {.Q} x₁ (_—→⟨_⟩_ P {.Q} {.Q} x₃ (.Q ∎)) | _—→⟨_⟩_ Q {.M} {.M} x₂ (M ∎) = L —→⟨ x₁ ⟩ P —→⟨ x₃ ⟩ Q —→⟨ x₂ ⟩ M ∎
+    fromF {L} {M} (trans′ x y) | _—→⟨_⟩_ L {.P} {.Q} x₁ (_—→⟨_⟩_ P {.L₁} {.Q} x₃ (L₁ —→⟨ x₄ ⟩ c)) | _—→⟨_⟩_ Q {.M} {.M} x₂ (M ∎) =     
       begin
         L
-      —→⟨ {!   !} ⟩ -- M₂ is not in scope but it is in context. It is probably coming from the
-        M₂          -- with pattern for fromF y but idk how to bring it into scope
-      —→⟨ {!   !} ⟩
-        M           
+      —→⟨ {!   !} ⟩ -- endless cycle of casing c
+        M
       ∎
+
+    fromF {L} {M} (trans′ x y) | L —→⟨ x₁ ⟩ L₂ —→⟨ x₃ ⟩ c | L₁ —→⟨ x₂ ⟩ L₃ —→⟨ x₄ ⟩ p = {!   !}
+-- ^ What am I supposed to do?
+-- I just don't understand what to do when things go wrong.
+-- What do I do here? Should I even have gotten to this point?
+-- It's such an unredable mess and naming things like
+-- L—→M­­₁ : L —→ M₁ isn't exactly more readable or typable
+
+-- fuck
+
+
+
+
 
 
