@@ -294,7 +294,8 @@ data _—↠′_ : Term → Term → Set where
 -- It's such an unredable mess and naming things like
 -- L—→M­­₁ : L —→ M₁ isn't exactly more readable or typable
 
--- fuck
+-- This isn't even listed as a Stretch exercise it's Practice
+-- It's so fucking demoralizing.
 
 
 
