@@ -280,6 +280,10 @@ data _—↠′_ : Term → Term → Set where
     fromF {L} {M} (trans′ x y) | L —→⟨ x₁ ⟩ c | L₁ —→⟨ x₂ ⟩ d =
       begin
         L
-      —→⟨ {!   !} ⟩ -- M₂ is probably coming from the with pattern
-        M           -- for fromF y but idk how to bring it into scope
+      —→⟨ {!   !} ⟩ -- M₂ is not in scope but it is in context. It is probably coming from the
+        M₂          -- with pattern for fromF y but idk how to bring it into scope
+      —→⟨ {!   !} ⟩
+        M           
       ∎
+
+
