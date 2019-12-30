@@ -281,6 +281,8 @@ data _—↠′_ : Term → Term → Set where
     from∘to (M ∎) = refl
     from∘to (L —→⟨ x ⟩ t) = cong (L —→⟨ x ⟩_) (from∘to t)
 
+---------
+
 -- Why does this
 confluence : ∀ {L M N} → ∃[ P ]
   ( ((L —↠ M) × (L —↠ N))
@@ -289,6 +291,10 @@ confluence : ∀ {L M N} → ∃[ P ]
 confluence = {!   !}
 
 -- case expand to this?
+-- Why this strange re-ordering where confluence' comes after?
+-- Why isn't it just confluence' ⟨ x , y ⟩ = {! !}
+-- Or confluence' ( x , y ) = {! !}
+-- Or confluence' record { proj₁ = x; proj₂ = y } = {! !}
 confluence' : ∀ {L M N} → ∃[ P ]
   ( ((L —↠ M) × (L —↠ N))
     --------------------
@@ -302,6 +308,9 @@ confluence'' : ∀ {L M N} → ∃[ P ]
     --------------------
   → ((M —↠ P) × (N —↠ P)) )
 confluence'' x = {!   !}
+
+---------
+
 
 diamond : ∀ {L M N} → ∃[ P ]
   ( ((L —→ M) × (L —→ N))
