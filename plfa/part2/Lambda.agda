@@ -283,33 +283,87 @@ data _—↠′_ : Term → Term → Set where
 
 ---------
 
+-- The book doesn't ask us to implement these but I thought I'd try
+-- but, uh, I don't see how there's any P that satisfies
+-- arbitrary M and N to specific P.
+
 confluence : ∀ {L M N} → ∃[ P ]
   ( ((L —↠ M) × (L —↠ N))
     --------------------
   → ((M —↠ P) × (N —↠ P)) )
-proj₁ (confluence {L}) = L
-proj₂ confluence ⟨ M ∎ , snd ⟩ = ⟨ {!   !} , {!   !} ⟩
-proj₂ confluence ⟨ L —→⟨ x ⟩ fst , snd ⟩ = {!   !}
-
-
-
----------
-
+confluence {L} {M} {N} = record { fst = {!   !} ; snd = snd' }
+  where
+    snd' : (L —↠ M) × (L —↠ N) → (M —↠ N) × (N —↠ N)
+    snd' ⟨ L ∎ , .L ∎ ⟩ = {!   !}
+    snd' ⟨ L ∎ , .L —→⟨ x ⟩ snd ⟩ = {!   !}
+    snd' ⟨ L —→⟨ x ⟩ fst , .L ∎ ⟩ = {!   !}
+    snd' ⟨ L —→⟨ x ⟩ fst , .L —→⟨ x₁ ⟩ snd ⟩ = {!   !}
 
 diamond : ∀ {L M N} → ∃[ P ]
   ( ((L —→ M) × (L —→ N))
     --------------------
   → ((M —↠ P) × (N —↠ P)) )
-diamond = {!   !}
+proj₁ diamond = `zero
+proj₂ diamond ⟨ fst , snd ⟩ = ⟨ {!   !} , {!   !} ⟩
 
+-- are these provable in agda?
 deterministic : ∀ {L M N}
   → L —→ M
   → L —→ N
     ------
   → M ≡ N
-deterministic lm ln = {!   !}
+deterministic x y = {!   !}
+
+{-
+"It is easy to show that every deterministic relation satisfies the diamond property, and that every relation that satisfies the diamond property is confluent. Hence, all the reduction systems studied in this text are trivially confluent."
+-}
+-- Whoever wrote this book has a far far different idea of what
+-- the word easy means. I don't even see how to show these
+-- properties exist for our Term type in the first place.
 
 
-
-
+-- This is the example given for 2 + 2 = 4
+-- There is no fucking way I'm writing 1 + 1 = 2 by hand
+-- Just look at these fucking moonrunes.
+_ : plus · two · two —↠ `suc `suc `suc `suc `zero
+_ =
+  begin
+    plus · two · two
+  —→⟨ ξ-·₁ (ξ-·₁ β-μ) ⟩
+    (ƛ "m" ⇒ ƛ "n" ⇒
+      case ` "m" [zero⇒ ` "n" |suc "m" ⇒ `suc (plus · ` "m" · ` "n") ])
+        · two · two
+  —→⟨ ξ-·₁ (β-ƛ (V-suc (V-suc V-zero))) ⟩
+    (ƛ "n" ⇒
+      case two [zero⇒ ` "n" |suc "m" ⇒ `suc (plus · ` "m" · ` "n") ])
+         · two
+  —→⟨ β-ƛ (V-suc (V-suc V-zero)) ⟩
+    case two [zero⇒ two |suc "m" ⇒ `suc (plus · ` "m" · two) ]
+  —→⟨ β-suc (V-suc V-zero) ⟩
+    `suc (plus · `suc `zero · two)
+  —→⟨ ξ-suc (ξ-·₁ (ξ-·₁ β-μ)) ⟩
+    `suc ((ƛ "m" ⇒ ƛ "n" ⇒
+      case ` "m" [zero⇒ ` "n" |suc "m" ⇒ `suc (plus · ` "m" · ` "n") ])
+        · `suc `zero · two)
+  —→⟨ ξ-suc (ξ-·₁ (β-ƛ (V-suc V-zero))) ⟩
+    `suc ((ƛ "n" ⇒
+      case `suc `zero [zero⇒ ` "n" |suc "m" ⇒ `suc (plus · ` "m" · ` "n") ])
+        · two)
+  —→⟨ ξ-suc (β-ƛ (V-suc (V-suc V-zero))) ⟩
+    `suc (case `suc `zero [zero⇒ two |suc "m" ⇒ `suc (plus · ` "m" · two) ])
+  —→⟨ ξ-suc (β-suc V-zero) ⟩
+    `suc `suc (plus · `zero · two)
+  —→⟨ ξ-suc (ξ-suc (ξ-·₁ (ξ-·₁ β-μ))) ⟩
+    `suc `suc ((ƛ "m" ⇒ ƛ "n" ⇒
+      case ` "m" [zero⇒ ` "n" |suc "m" ⇒ `suc (plus · ` "m" · ` "n") ])
+        · `zero · two)
+  —→⟨ ξ-suc (ξ-suc (ξ-·₁ (β-ƛ V-zero))) ⟩
+    `suc `suc ((ƛ "n" ⇒
+      case `zero [zero⇒ ` "n" |suc "m" ⇒ `suc (plus · ` "m" · ` "n") ])
+        · two)
+  —→⟨ ξ-suc (ξ-suc (β-ƛ (V-suc (V-suc V-zero)))) ⟩
+    `suc `suc (case `zero [zero⇒ two |suc "m" ⇒ `suc (plus · ` "m" · two) ])
+  —→⟨ ξ-suc (ξ-suc β-zero) ⟩
+    `suc (`suc (`suc (`suc `zero)))
+  ∎
 
