@@ -446,7 +446,7 @@ postulate
   -- What does it want me to write for this exercise?
   -- What does it mean by equivalence? _≃_ ? _⇔_ ?
   
-  -- later exercises reveal that equivalence means _⇔_
+  -- later exercises suggest that equivalence means _⇔_
   -- and isomorphism means _≃_
   
 -- is this really the intent?
@@ -465,25 +465,25 @@ All-++-≃ xs ys =
   record
   { to = to (All-++-⇔ xs ys)
   ; from = from (All-++-⇔ xs ys)
-  ; to∘from = λ { ⟨ [] , ys ⟩ → refl
-                ; ⟨ x ∷ xs , ys ⟩ → let c = to∘from in {!   !}}
-  ; from∘to = {!   !}
+  ; to∘from = to∘from
+  ; from∘to = from∘to
   }
-  where open _⇔_; open _≃_
-  
-  
+  where
+    open _⇔_
 
+    to∘from : ∀ {P} → (y : All P xs × All P ys) →
+      to (All-++-⇔ xs ys)
+      (from (All-++-⇔ xs ys) y)
+      ≡ y
+    to∘from ⟨ [] , snd ⟩ = refl
+    to∘from ⟨ x ∷ fst , snd ⟩ =
+      cong₂ ⟨_,_⟩ (cong (x ∷_) {!   !}) {!   !}
+    -- ^ how do?
+    
+    from∘to : ∀ {P} → (y : All P (xs ++ ys))
+      → from (All-++-⇔ xs ys) (to (All-++-⇔ xs ys) y) ≡ y
+    from∘to y = {!   !}
+    -- ^ why can't I case y, why can't I case xs?
 
+    -- Why do I have to write ∀ {P} but not ∀ {P xs ys} ?
 
-
-
-
-
-{-
-
-https://player.vimeo.com/video/308429699
-https://player.vimeo.com/video/308438309
-https://player.vimeo.com/video/308450563
-
-
--}
