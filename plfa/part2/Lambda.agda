@@ -283,31 +283,15 @@ data _—↠′_ : Term → Term → Set where
 
 ---------
 
--- Why does this
 confluence : ∀ {L M N} → ∃[ P ]
   ( ((L —↠ M) × (L —↠ N))
     --------------------
   → ((M —↠ P) × (N —↠ P)) )
-confluence = {!   !}
+proj₁ (confluence {L}) = L
+proj₂ confluence ⟨ M ∎ , snd ⟩ = ⟨ {!   !} , {!   !} ⟩
+proj₂ confluence ⟨ L —→⟨ x ⟩ fst , snd ⟩ = {!   !}
 
--- case expand to this?
--- Why this strange re-ordering where confluence' comes after?
--- Why isn't it just confluence' ⟨ x , y ⟩ = {! !}
--- Or confluence' ( x , y ) = {! !}
--- Or confluence' record { proj₁ = x; proj₂ = y } = {! !}
-confluence' : ∀ {L M N} → ∃[ P ]
-  ( ((L —↠ M) × (L —↠ N))
-    --------------------
-  → ((M —↠ P) × (N —↠ P)) )
-proj₁ confluence' = {!   !}
-proj₂ confluence' = {!   !}
 
--- why is this an error?
-confluence'' : ∀ {L M N} → ∃[ P ]
-  ( ((L —↠ M) × (L —↠ N))
-    --------------------
-  → ((M —↠ P) × (N —↠ P)) )
-confluence'' x = {!   !}
 
 ---------
 
