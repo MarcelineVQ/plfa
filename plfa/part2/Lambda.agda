@@ -7,6 +7,7 @@ open import Data.Empty using (⊥; ⊥-elim)
 open import Relation.Nullary using (Dec; yes; no; ¬_)
 open import Data.List using (List; _∷_; [])
 open import plfa.part1.Isomorphism
+open import Data.Product using (_×_; ∃; ∃-syntax;proj₁;proj₂) renaming (_,_ to ⟨_,_⟩)
 
 Id : Set
 Id = String
@@ -280,7 +281,40 @@ data _—↠′_ : Term → Term → Set where
     from∘to (M ∎) = refl
     from∘to (L —→⟨ x ⟩ t) = cong (L —→⟨ x ⟩_) (from∘to t)
 
+-- Why does this
+confluence : ∀ {L M N} → ∃[ P ]
+  ( ((L —↠ M) × (L —↠ N))
+    --------------------
+  → ((M —↠ P) × (N —↠ P)) )
+confluence = {!   !}
 
+-- case expand to this?
+confluence' : ∀ {L M N} → ∃[ P ]
+  ( ((L —↠ M) × (L —↠ N))
+    --------------------
+  → ((M —↠ P) × (N —↠ P)) )
+proj₁ confluence' = {!   !}
+proj₂ confluence' = {!   !}
+
+-- why is this an error?
+confluence'' : ∀ {L M N} → ∃[ P ]
+  ( ((L —↠ M) × (L —↠ N))
+    --------------------
+  → ((M —↠ P) × (N —↠ P)) )
+confluence'' x = {!   !}
+
+diamond : ∀ {L M N} → ∃[ P ]
+  ( ((L —→ M) × (L —→ N))
+    --------------------
+  → ((M —↠ P) × (N —↠ P)) )
+diamond = {!   !}
+
+deterministic : ∀ {L M N}
+  → L —→ M
+  → L —→ N
+    ------
+  → M ≡ N
+deterministic lm ln = {!   !}
 
 
 
