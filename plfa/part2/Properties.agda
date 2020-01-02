@@ -64,7 +64,7 @@ canonical'' cv V-ƛ = {!   !}
 canonical'' cv V-zero = {!   !}
 canonical'' cv (V-suc v) = {!   !}
 
---cased both at once
+-- cased both at once
 canonical''' : ∀ {V A} → ∅ ⊢ V ⦂ A → Value V → Canonical V ⦂ A
 canonical''' (⊢` x) ()
 canonical''' (⊢ƛ cv) V-ƛ = {!   !}
