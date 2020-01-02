@@ -52,7 +52,27 @@ data Canonical_⦂_ : Term → Type → Set where
 canonical : ∀ {V A} → ∅ ⊢ V ⦂ A → Value V → Canonical V ⦂ A
 canonical cv v = {!   !}
 
+-- cased cv
+canonical' : ∀ {V A} → ∅ ⊢ V ⦂ A → Value V → Canonical V ⦂ A
+canonical' (⊢ƛ cv) v = {!   !}
+canonical' ⊢zero v = {!   !}
+canonical' (⊢suc cv) v = {!   !}
 
+-- cased v
+canonical'' : ∀ {V A} → ∅ ⊢ V ⦂ A → Value V → Canonical V ⦂ A
+canonical'' cv V-ƛ = {!   !}
+canonical'' cv V-zero = {!   !}
+canonical'' cv (V-suc v) = {!   !}
+
+--cased both at once
+canonical''' : ∀ {V A} → ∅ ⊢ V ⦂ A → Value V → Canonical V ⦂ A
+canonical''' (⊢` x) ()
+canonical''' (⊢ƛ cv) V-ƛ = {!   !}
+canonical''' (cv · cv₁) ()
+canonical''' ⊢zero V-zero = {!   !}
+canonical''' (⊢suc cv) (V-suc v) = {!   !}
+canonical''' (⊢case cv cv₁ cv₂) ()
+canonical''' (⊢μ cv) ()
 
 
 
