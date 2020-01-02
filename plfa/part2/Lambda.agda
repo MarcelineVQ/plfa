@@ -18,6 +18,8 @@ infixl 7  _·_
 infix  8  `suc_
 infix  9  `_
 
+
+
 data Term : Set where
   `_                      :  Id → Term
   ƛ_⇒_                    :  Id → Term → Term
@@ -283,6 +285,8 @@ data _—↠′_ : Term → Term → Set where
 
 ---------
 
+{-
+
 -- The book doesn't ask us to implement these but I thought I'd try
 -- but, uh, I don't see how there's any P that satisfies
 -- arbitrary M and N to specific P.
@@ -291,12 +295,12 @@ confluence : ∀ {L M N} → ∃[ P ]
   ( ((L —↠ M) × (L —↠ N))
     --------------------
   → ((M —↠ P) × (N —↠ P)) )
-confluence {L} {M} {N} = record { fst = {!   !} ; snd = snd' }
+confluence {L} {M} {N} = record { fst = N ; snd = snd' }
   where
     snd' : (L —↠ M) × (L —↠ N) → (M —↠ N) × (N —↠ N)
     snd' ⟨ L ∎ , .L ∎ ⟩ = {!   !}
     snd' ⟨ L ∎ , .L —→⟨ x ⟩ snd ⟩ = {!   !}
-    snd' ⟨ L —→⟨ x ⟩ fst , .L ∎ ⟩ = {!   !}
+    snd' ⟨ L —→⟨ x ⟩ fst , .L ∎ ⟩ = {! -d -t 5  !}
     snd' ⟨ L —→⟨ x ⟩ fst , .L —→⟨ x₁ ⟩ snd ⟩ = {!   !}
 
 diamond : ∀ {L M N} → ∃[ P ]
@@ -314,6 +318,8 @@ deterministic : ∀ {L M N}
   → M ≡ N
 deterministic x y = {!   !}
 
+-}
+
 {-
 "It is easy to show that every deterministic relation satisfies the diamond property, and that every relation that satisfies the diamond property is confluent. Hence, all the reduction systems studied in this text are trivially confluent."
 -}
@@ -323,7 +329,7 @@ deterministic x y = {!   !}
 
 
 -- This is the example given for 2 + 2 = 4
--- There is no fucking way I'm writing 1 + 1 = 2 by hand
+-- There is no way I'm writing 1 + 1 = 2 by hand
 -- Just look at these fucking moonrunes.
 _ : plus · two · two —↠ `suc `suc `suc `suc `zero
 _ =
@@ -366,4 +372,229 @@ _ =
   —→⟨ ξ-suc (ξ-suc β-zero) ⟩
     `suc (`suc (`suc (`suc `zero)))
   ∎
+
+
+
+infixr 7 _⇒_
+
+data Type : Set where
+  _⇒_ : Type → Type → Type
+  `ℕ : Type
+
+infixl 5  _,_⦂_
+
+data Context : Set where
+  ∅     : Context
+  _,_⦂_ : Context → Id → Type → Context
+
+module Context-≃ where
+  open _≃_
+  
+  Context-≃ : Context ≃ List (Id × Type)
+  to Context-≃ ∅ = []
+  to Context-≃ (c , id ⦂ ty) = ⟨ id , ty ⟩ ∷ to Context-≃ c
+  from Context-≃ [] = ∅
+  from Context-≃ (⟨ id , ty ⟩ ∷ c) = from Context-≃ c , id ⦂ ty
+  from∘to Context-≃ ∅ = refl
+  from∘to Context-≃ (c , id ⦂ ty) = cong (_, id ⦂ ty) (from∘to Context-≃ c)
+  to∘from Context-≃ [] = refl
+  to∘from Context-≃ (⟨ id , ty ⟩ ∷ c) = cong (⟨ id , ty ⟩ ∷_)   (to∘from Context-≃ c)
+
+
+infix  4  _∋_⦂_
+
+-- context lookup
+data _∋_⦂_ : Context → Id → Type → Set where
+
+  Z : ∀ {Γ x A}
+      ------------------
+    → Γ , x ⦂ A ∋ x ⦂ A
+
+  S : ∀ {Γ x y A B}
+    → x ≢ y
+    → Γ ∋ x ⦂ A
+      ------------------
+    → Γ , y ⦂ B ∋ x ⦂ A
+-- I don't understand the purpose of the x ≢ y
+-- The text says "If two variables in a context have the same
+-- name, then lookup should return the most recently bound
+-- variable, which shadows the other variables. "
+-- So why are we preventing shadowing with the S constructor?
+
+-- Additionaly the text says
+-- "Constructor S takes an additional parameter, which ensures
+-- that when we look up a variable that it is not shadowed by
+-- another variable with the same name to its left in the list."
+-- But isn't it the right that 'shadows'? As a snoclist the right
+-- is the newest addition and thus the 'most recently bound',
+-- isn't it?
+-- why does it matter that a variable "is not shadowed by
+-- another variable with the same name to its left"
+
+infix  4  _⊢_⦂_
+
+-- Type Derivation
+data _⊢_⦂_ : Context → Term → Type → Set where
+
+  -- Axiom
+  ⊢` : ∀ {Γ x A}
+    → Γ ∋ x ⦂ A
+      -----------
+    → Γ ⊢ ` x ⦂ A
+
+  -- ⇒-I 
+  ⊢ƛ : ∀ {Γ x N A B}
+    → Γ , x ⦂ A ⊢ N ⦂ B
+      -------------------
+    → Γ ⊢ ƛ x ⇒ N ⦂ A ⇒ B
+
+  -- ⇒-E
+  _·_ : ∀ {Γ L M A B}
+    → Γ ⊢ L ⦂ A ⇒ B
+    → Γ ⊢ M ⦂ A
+      -------------
+    → Γ ⊢ L · M ⦂ B
+
+  -- ℕ-I₁
+  ⊢zero : ∀ {Γ}
+      --------------
+    → Γ ⊢ `zero ⦂ `ℕ
+
+  -- ℕ-I₂
+  ⊢suc : ∀ {Γ M}
+    → Γ ⊢ M ⦂ `ℕ
+      ---------------
+    → Γ ⊢ `suc M ⦂ `ℕ
+
+  -- ℕ-E
+  ⊢case : ∀ {Γ L M x N A}
+    → Γ ⊢ L ⦂ `ℕ
+    → Γ ⊢ M ⦂ A
+    → Γ , x ⦂ `ℕ ⊢ N ⦂ A
+      -------------------------------------
+    → Γ ⊢ case L [zero⇒ M |suc x ⇒ N ] ⦂ A
+
+  ⊢μ : ∀ {Γ x M A}
+    → Γ , x ⦂ A ⊢ M ⦂ A
+      -----------------
+    → Γ ⊢ μ x ⇒ M ⦂ A
+
+-- Text says "The entire process can be automated using Agsy, invoked with C-c C-a."
+-- Which can often work but seems to be untrue for this case, agda reports:
+-- Not implemented: The Agda synthesizer (Agsy) does not support literals yet
+-- What literal is it referring to?
+⊢sucᶜ : ∅ ⊢ sucᶜ ⦂ `ℕ ⇒ `ℕ
+⊢sucᶜ = ⊢ƛ (⊢suc (⊢` Z))
+
+-- lookup is injective, as a consequence of our x ≢ y for ∋
+-- why is this important if we're supposed to have a context
+-- which allows shadowing?
+∋-injective : ∀ {Γ x A B} → Γ ∋ x ⦂ A → Γ ∋ x ⦂ B → A ≡ B
+∋-injective Z        Z          =  refl
+∋-injective Z        (S x≢ _)   =  ⊥-elim (x≢ refl)
+∋-injective (S x≢ _) Z          =  ⊥-elim (x≢ refl)
+∋-injective (S _ ∋x) (S _ ∋x′)  =  ∋-injective ∋x ∋x′
+
+-- How did they write this? How do I write this myself?
+nope₁ : ∀ {A} → ¬ (∅ ⊢ `zero · `suc `zero ⦂ A)
+nope₁ (() · _)
+
+-- ^ you can write
+-- nope₁ x = {! !}          -- then case on x
+-- nope₁ (c · c₁) = {!   !} -- then case on c
+-- nope₁ (() · c₁)
+
+nope₂ : ∀ {A} → ¬ (∅ ⊢ ƛ "x" ⇒ ` "x" · ` "x" ⦂ A)
+nope₂ (⊢ƛ (⊢` ∋x · ⊢` ∋x′))  =  contradiction (∋-injective ∋x ∋x′)
+  where
+  contradiction : ∀ {A B} → ¬ (A ⇒ B ≡ A)
+  contradiction ()
+
+nope₂' : ∀ {A} → ¬ (∅ ⊢ ƛ "x" ⇒ ` "x" · ` "x" ⦂ A)
+nope₂' (⊢ƛ (⊢` Z · ⊢` (S _ ())))
+
+-- Task: For each of the following, give a type A for which it is
+-- derivable, or explain why there is no such A.
+-- What does derivable mean?
+-- To create a type derivation?
+-- This is quite hard, up until now we've just been writing pieces
+-- now we have to understand how the connect.
+
+-- It couldn't be clearer that A is `ℕ here, how can I show
+-- this to agda. It should be mechanical.
+-- ∅ , "y" ⦂ `ℕ ⇒ `ℕ , "x" ⦂ `ℕ ⊢ ` "y" · ` "x" ⦂ A
+-- added parens because this is very hard to parse mentally
+--                Context                 Term          Type
+der₁ : (∅ , "y" ⦂ `ℕ ⇒ `ℕ , "x" ⦂ `ℕ) ⊢ (` "y" · ` "x") ⦂ (`ℕ)
+der₁ = ⊢` (S (λ ()) Z {- 1 -}) ·  ⊢` Z {- 2 -}
+-- {- 1 -} oddly, agda could not fill in this Z with C-c C-r
+-- probably due to the right side of · not being filled in.
+-- {- 2 -} this also was not able to be filled in with C-c C-r
+-- since it had a choice of S or Z, despite Z being the clear fit.
+
+
+-- Pretty clearly not derivable based on the types.
+-- ∅ , "y" ⦂ `ℕ ⇒ `ℕ , "x" ⦂ `ℕ ⊢ ` "x" · ` "y" ⦂ A
+der₂ : ∀ {A} → ¬ (∅ , "y" ⦂ `ℕ ⇒ `ℕ , "x" ⦂ `ℕ ⊢ ` "x" · ` "y" ⦂ A)
+der₂ (⊢` (S _ (S _ ())) · _)
+
+-- ∅ , "y" ⦂ `ℕ ⇒ `ℕ ⊢ ƛ "x" ⇒ ` "y" · ` "x" ⦂ A
+der₃ : ∅ , "y" ⦂ `ℕ ⇒ `ℕ ⊢ ƛ "x" ⇒ ` "y" · ` "x" ⦂ `ℕ ⇒ `ℕ
+der₃ = ⊢ƛ ((⊢` (S (λ ()) Z)) · ⊢` Z)
+
+-- ^ These are very good exercises for understanding the material.
+
+
+-- Task: For each of the following, give types A, B, and C for
+-- which it is derivable, or explain why there are no such types.
+
+-- Cannot, there's no way to ` "x" · ` "x" with any single type.
+-- You would need ` "x" of some polymorphic type so that the
+-- first occurence of ` "x" was A ⇒ A, and the second could be
+-- (A ⇒ A) ⇒ (A ⇒ A)
+-- ∅ , "x" ⦂ A ⊢ ` "x" · ` "x" ⦂ B
+-- der₄ : ∀ {A} → ∅ , "x" ⦂ (A ⇒ A) ⊢ ` "x" · ` "x" ⦂ (A ⇒ A)
+-- der₄ = {! !}
+
+-- A : `ℕ ⇒ `ℕ
+-- B : `ℕ ⇒ `ℕ
+-- C : `ℕ ⇒ `ℕ
+-- ∅ , "x" ⦂ A , "y" ⦂ B ⊢ ƛ "z" ⇒ ` "x" · (` "y" · ` "z") ⦂ C
+der₅ : ∅ , "x" ⦂ `ℕ ⇒ `ℕ , "y" ⦂ `ℕ ⇒ `ℕ ⊢ ƛ "z" ⇒ ` "x" · (` "y" · ` "z") ⦂ `ℕ ⇒ `ℕ
+der₅ = ⊢ƛ (⊢` (S (λ ()) (S ((λ ())) Z))
+        · ((⊢` (S ((λ ())) Z)) · ⊢` Z))
+
+
+-- uh, wow, don't want to do too many of these by hand
+-- used `ℕ just to keep sig simple
+⊢mul₁ : ∅ ⊢ mul ⦂ `ℕ ⇒ `ℕ ⇒ `ℕ
+⊢mul₁ = ⊢μ (⊢ƛ (⊢ƛ (
+  ⊢case
+    (⊢` (S (λ ()) Z))
+    ⊢zero
+    (((⊢μ (⊢ƛ (⊢ƛ (⊢case
+                    (⊢` (S (λ ()) Z))
+                    (⊢` Z)
+                    (⊢suc ((⊢` (S (λ ()) (S (λ ()) (S (λ ()) Z))))
+                      · (⊢` Z)
+                      · (⊢` (S (λ ()) Z))))))))
+      · ⊢` (S (λ ()) Z))
+      · ((⊢` (S (λ ()) (S (λ ()) (S (λ ()) Z))))
+         · ⊢` Z
+         · ⊢` (S (λ ()) Z))))))
+
+⊢mulᶜ : ∅ ⊢ mulᶜ ⦂ ((`ℕ ⇒ `ℕ) ⇒ (`ℕ ⇒ `ℕ)) ⇒ ((`ℕ ⇒ `ℕ) ⇒ `ℕ ⇒ `ℕ) ⇒ (`ℕ ⇒ `ℕ) ⇒ `ℕ ⇒ `ℕ
+⊢mulᶜ = ⊢ƛ (⊢ƛ (⊢ƛ (⊢ƛ (((⊢` (S (λ ()) (S (λ ()) Z)))
+                          · (⊢` (S (λ ()) (S (λ ()) (S (λ ()) Z)))
+                              · ⊢` (S (λ ()) Z)))
+                     · ⊢` Z))))
+-- generalized sig
+⊢mulᶜᵍ : ∀ {A B C D E F} → ∅ ⊢ mulᶜ ⦂ ((A ⇒ B) ⇒ (C ⇒ D)) ⇒ ((C ⇒ D) ⇒ E ⇒ F) ⇒ (A ⇒ B) ⇒ E ⇒ F
+⊢mulᶜᵍ = ⊢ƛ (⊢ƛ (⊢ƛ (⊢ƛ (((⊢` (S (λ ()) (S (λ ()) Z)))
+                          · (⊢` (S (λ ()) (S (λ ()) (S (λ ()) Z)))
+                              · ⊢` (S (λ ()) Z)))
+                     · ⊢` Z))))
+
+
+
 
