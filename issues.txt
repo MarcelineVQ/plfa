@@ -49,6 +49,26 @@ foo : {b : Nat} -> B; foo {a} = ?
 I wonder how much this conflicts with that desire, or how useful/relied-on that design even is.
 
 
+plfa
 module Decidable import should be _≤_; z<n; s<s
 
+
 Decidable.agda unicode says ⌊  U+230A  LEFT FLOOR (\cll)  but it's \clL  same for \clr
+
+
+
+could use a version of C-c C-c that always creates impossible cases when it can instead of skipping them.
+documenting what constructors we're not matching can be as important as what we are, especially when there's many constructors. This might seem unintuitive since if there's a lot that are impossible we don't want to annoy ourselves  with noise right? wrong. It's not noise, it's a reminder of what constructors exist for that type and a plain statement about which are allowed.
+
+
+could use a version of C-c C-c that names its variables as contractions of the type, since everyone seems to name their variables in this manner anyway
+e.g.
+-- casing the hole
+foo : ∀ {x : ℕ} → x ≡ x → ℕ; foo x = {!   !}
+-- would give
+foo x₁≡x₁ = {!   !}
+-- instead of 
+foo x = {!   !}
+-- essentially we're naming the variable by its type
+
+

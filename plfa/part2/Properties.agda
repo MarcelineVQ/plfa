@@ -50,29 +50,18 @@ data Canonical_⦂_ : Term → Type → Set where
 -- casing cv or v will skip creating impossible/empty cases
 -- casing both cv and v at once will retain them.
 canonical : ∀ {V A} → ∅ ⊢ V ⦂ A → Value V → Canonical V ⦂ A
-canonical cv v = {!   !}
+canonical (⊢` x) ()
+canonical (⊢ƛ cv) V-ƛ = C-ƛ cv
+canonical (cv · cv₁) ()
+canonical ⊢zero V-zero = C-zero
+canonical (⊢suc cv) (V-suc v) = C-suc (canonical cv v)
+canonical (⊢case cv cv₁ cv₂) ()
+canonical (⊢μ cv) ()
 
--- cased cv
-canonical' : ∀ {V A} → ∅ ⊢ V ⦂ A → Value V → Canonical V ⦂ A
-canonical' (⊢ƛ cv) v = {!   !}
-canonical' ⊢zero v = {!   !}
-canonical' (⊢suc cv) v = {!   !}
+{-
 
--- cased v
-canonical'' : ∀ {V A} → ∅ ⊢ V ⦂ A → Value V → Canonical V ⦂ A
-canonical'' cv V-ƛ = {!   !}
-canonical'' cv V-zero = {!   !}
-canonical'' cv (V-suc v) = {!   !}
+<mniip> are there reasons we use monads (and free monads in particular) other than because their kleisli categories are closed cartesian
+<mniip> can we generate a free closed cartesian category instead?
+<mniip> from a semigroupoid?
 
--- cased both at once
-canonical''' : ∀ {V A} → ∅ ⊢ V ⦂ A → Value V → Canonical V ⦂ A
-canonical''' (⊢` x) ()
-canonical''' (⊢ƛ cv) V-ƛ = {!   !}
-canonical''' (cv · cv₁) ()
-canonical''' ⊢zero V-zero = {!   !}
-canonical''' (⊢suc cv) (V-suc v) = {!   !}
-canonical''' (⊢case cv cv₁ cv₂) ()
-canonical''' (⊢μ cv) ()
-
-
-
+-}
